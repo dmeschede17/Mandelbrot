@@ -1,0 +1,31 @@
+
+# Directories
+
+/[Rr]eleases/** 
+
+# Project files
+
+*.csproj.user
+*.pubxml.user
+
+# Solution subdirectories
+
+**/.vs/**
+
+**/x64/[Dd]ebug/**
+**/x64/[Rr]elease/**
+
+# Project subdirectories
+
+**/obj/*
+**/obj/[Dd]ebug/** 
+**/obj/[Rr]elease/**
+**/obj/x64/[Dd]ebug/**
+**/obj/x64/[Rr]elease/**
+**/obj/[Pp]ublish/**
+
+**/bin/[Dd]ebug/**
+**/bin/[Rr]elease/**
+**/bin/x64/[Dd]ebug/**
+**/bin/x64/[Rr]elease/**
+**/bin/[Pp]ublish/**

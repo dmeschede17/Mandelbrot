@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>Mandelbrot.ico</ApplicationIcon>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>x64</Platforms>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AnalysisMode>All</AnalysisMode>
+        <Nullable>enable</Nullable>
+        <DebugType>embedded</DebugType>
+        <Version>1.0.1</Version>
+        <Copyright>Copyright (c) 2025 Dietmar Meschede</Copyright>
+        <RepositoryUrl>https://github.com/dmeschede17/Mandelbrot</RepositoryUrl>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Management" Version="9.0.2" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\DiLib.Threading\DiLib.Threading.csproj" />
+        <ProjectReference Include="..\MandelbrotLib\MandelbrotLib.csproj" />
+    </ItemGroup>
+</Project>
