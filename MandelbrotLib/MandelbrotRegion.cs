@@ -5,7 +5,6 @@ public readonly record struct MandelbrotRegion
     public const double DefaultRegionWidth = 6.3;
     public const double DefaultRegionHeight = 4.2;
 
-
     public double X0 { get; init; }
     public double Y0 { get; init; }
     public double X1 { get; init; }

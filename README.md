@@ -12,7 +12,6 @@ Project Name    | Description
 Mandelbrot      | WPF application for generating Mandelbrot images
 MandelbrotLib   | Implementation of different multi-threaded variants of the Mandelbrot algorithm
 MandelbrotMasm  | MASM implementation of the Mandelbrot algorithm (currently not used in the solution)
-DiLib.Threading | Provides thread cluster with fast startup and fast synchronization
 
 ### Links
 

@@ -1,5 +1,4 @@
-﻿using DiLib.Threading;
-using MandelbrotLib.Implementations;
+﻿using MandelbrotLib.Implementations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -8,11 +7,7 @@ namespace MandelbrotLib;
 
 public sealed class MandelbrotGenerator : IDisposable
 {
-    const ThreadPriority DefaultThreadPriority = ThreadPriority.Normal;
-    const ThreadPriority BenchmarkThreadPriority = ThreadPriority.AboveNormal;
-
     Task? task;
-    ThreadCluster? threadCluster;
     MandelbrotBase mandelbrot = new MandelbrotNull();
 
     public MandelbrotBase Mandelbrot => mandelbrot;
@@ -31,14 +26,14 @@ public sealed class MandelbrotGenerator : IDisposable
 
     public void Dispose()
     {
-        threadCluster?.Dispose();
         mandelbrot?.Dispose();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    void PrepareCalculation(Type mandelbrotType, int width, int height, int numTasks, in MandelbrotRegion region, int maxIterations, ThreadPriority? threadPriority = null)
+    void PrepareCalculation(Type mandelbrotType, int width, int height, int numTasks, in MandelbrotRegion region, int maxIterations)
     {
         ArgumentNullException.ThrowIfNull(mandelbrotType, nameof(mandelbrotType));
+
         ThrowIfNotPositive(width, nameof(width));
         ThrowIfNotPositive(height, nameof(height));
         ThrowIfNotPositive(numTasks, nameof(numTasks));
@@ -66,24 +61,7 @@ public sealed class MandelbrotGenerator : IDisposable
 
         Debug.Assert(mandelbrot != null);
 
-        if (numTasks > 1)
-        {
-            if (threadCluster?.NumThreads != numTasks)
-            {
-                threadCluster?.Dispose();
-                threadCluster = new ThreadCluster(numTasks, threadPriority: threadPriority ?? DefaultThreadPriority);
-            }
-            else
-            {
-                if (threadPriority != null)
-                {
-                    threadCluster.SetAllThreadPriority(threadPriority.Value);
-                }
-            }
-        }
-
-        result = new MandelbrotResult()
-        {
+        result = new MandelbrotResult() {
             ImplementationName = mandelbrotType.GetMandelbrotName(),
             Width = width,
             Height = height,
@@ -115,7 +93,7 @@ public sealed class MandelbrotGenerator : IDisposable
 
         Stopwatch stopwatch = new();
 
-        if (threadCluster == null || result.NumTasks == 1)
+        if (result.NumTasks <= 1)
         {
             stopwatch.Start();
             mandelbrot.Calculate(rectangle: result.Region, maxIterations: maxIterations);
@@ -124,7 +102,7 @@ public sealed class MandelbrotGenerator : IDisposable
         else
         {
             stopwatch.Start();
-            mandelbrot.Calculate(rectangle: result.Region, maxIterations: maxIterations, threadCluster);
+            mandelbrot.Calculate(rectangle: result.Region, maxIterations: maxIterations, result.NumTasks);
             stopwatch.Stop();
         }
 
@@ -152,17 +130,19 @@ public sealed class MandelbrotGenerator : IDisposable
     {
         ThrowIfNotPositive(maxIterations, nameof(maxIterations));
 
-        PrepareCalculation(mandelbrotType, width, height, numTasks, in region, maxIterations, benchmark ? BenchmarkThreadPriority : null);
-
-        if (benchmark)
-        {
-            Calculate(maxIterations: 16);
-        }
+        PrepareCalculation(mandelbrotType, width, height, numTasks, in region, maxIterations);
 
         bool noGCRegion = false;
 
         try
         {
+            if (benchmark)
+            {
+                Calculate(maxIterations: 16);
+
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
+            }
+
             noGCRegion = benchmark && GC.TryStartNoGCRegion(1024 * 1024);
 
             Calculate();
@@ -176,7 +156,7 @@ public sealed class MandelbrotGenerator : IDisposable
 
             if (benchmark)
             {
-                threadCluster?.SetAllThreadPriority(DefaultThreadPriority);
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
             }
         }
     }

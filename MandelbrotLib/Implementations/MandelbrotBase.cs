@@ -1,5 +1,4 @@
-﻿using DiLib.Threading;
-using MandelbrotLib.Utils;
+﻿using MandelbrotLib.Utils;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -104,22 +103,24 @@ unsafe public abstract class MandelbrotBase(int widthAlignment, int heightAlignm
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public void Calculate(MandelbrotRegion rectangle, int maxIterations, ThreadCluster threadCluster)
+    public void Calculate(MandelbrotRegion rectangle, int maxIterations, int numTasks)
     {
-        ArgumentNullException.ThrowIfNull(threadCluster, nameof(threadCluster));
+        numTasks = Math.Max(1, numTasks);
 
         iterationsMaxIterations = maxIterations;
 
-        var numRows = Height;
-        var numThreads = threadCluster.NumThreads;
+        int numRows = Height;
+        int numTasksLocal = Math.Max(1, numTasks);
 
-        for (int i = 0; i < numThreads; i++)
+        Task[] tasks = new Task[numTasksLocal];
+
+        for (int i = 0; i < numTasksLocal; i++)
         {
-            var firstRow = i;
-            threadCluster.ThreadAction(i) = () => Calculate(rectangle, maxIterations, firstRow, numRows, numThreads);
+            int firstRow = i;
+            tasks[i] = Task.Run(() => Calculate(rectangle, maxIterations, firstRow, numRows, numTasksLocal));
         }
 
-        threadCluster.Run();
+        Task.WaitAll(tasks);
     }
 
     public void CalculateFirstRow(MandelbrotRegion rectangle, int maxIterations) => Calculate(rectangle, maxIterations, 0, 1, 1);

@@ -10,16 +10,15 @@
         <AnalysisMode>All</AnalysisMode>
         <Nullable>enable</Nullable>
         <DebugType>embedded</DebugType>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
         <Copyright>Copyright (c) 2025 Dietmar Meschede</Copyright>
         <RepositoryUrl>https://github.com/dmeschede17/Mandelbrot</RepositoryUrl>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="System.Management" Version="9.0.2" />
+        <PackageReference Include="System.Management" Version="9.0.3" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\DiLib.Threading\DiLib.Threading.csproj" />
         <ProjectReference Include="..\MandelbrotLib\MandelbrotLib.csproj" />
     </ItemGroup>
 </Project>

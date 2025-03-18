@@ -12,8 +12,4 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\DiLib.Threading\DiLib.Threading.csproj" />
-    </ItemGroup>
-
 </Project>
